@@ -8,9 +8,6 @@
 #include <sys/socket.h>
 #include <netinet/ip.h>
 
-static void msg(const char *msg) {
-    fprintf(stderr, "%s\n", msg);
-}
 
 static void die(const char *msg) {
     int err = errno;
@@ -45,54 +42,54 @@ int main(){
     }
 
     // Message that will be sent to the server
-char msg[] = "hello";
+    char msg[] = "hello";
 
-/*
- * write():
- * Sends data to the file descriptor `fd`
- * - fd      : socket connected to the server
- * - msg     : pointer to data to send
- * - strlen(msg) : number of bytes to send (without '\0')
- */
-write(socket_fd, msg, strlen(msg));
+    /*
+    * write():
+    * Sends data to the file descriptor `fd`
+    * - fd      : socket connected to the server
+    * - msg     : pointer to data to send
+    * - strlen(msg) : number of bytes to send (without '\0')
+    */
+    write(socket_fd, msg, strlen(msg));
 
 
-// Buffer to store data received from the server
-// Initialized to zero so it is null-terminated by default
-char rbuf[64] = {0};
+    // Buffer to store data received from the server
+    // Initialized to zero so it is null-terminated by default
+    char rbuf[64] = {0};
 
-/*
- * read():
- * Reads data from the socket into rbuf
- * - fd                : socket descriptor
- * - rbuf              : buffer to store received data
- * - sizeof(rbuf) - 1  : leave space for '\0'
- *
- * Returns:
- *  - number of bytes read (>= 0)
- *  - -1 on error
- */
-ssize_t n = read(socket_fd, rbuf, sizeof(rbuf) - 1);
+    /*
+    * read():
+    * Reads data from the socket into rbuf
+    * - fd                : socket descriptor
+    * - rbuf              : buffer to store received data
+    * - sizeof(rbuf) - 1  : leave space for '\0'
+    *
+    * Returns:
+    *  - number of bytes read (>= 0)
+    *  - -1 on error
+    */
+    ssize_t n = read(socket_fd, rbuf, sizeof(rbuf) - 1);
 
-if (n < 0) {
-    // If read() fails, print error and abort program
-    die("read");
-}
+    if (n < 0) {
+        // If read() fails, print error and abort program
+        die("read");
+    }
 
-/*
- * Since rbuf is null-terminated, it can be safely printed as a string
- */
-printf("server says: %s\n", rbuf);
+    /*
+    * Since rbuf is null-terminated, it can be safely printed as a string
+    */
+    printf("server says: %s\n", rbuf);
 
-/*
- * close():
- * Closes the socket
- * Releases kernel resources
- */
-close(socket_fd);
+    /*
+    * close():
+    * Closes the socket
+    * Releases kernel resources
+    */
+    close(socket_fd);
 
-// Program finished successfully
-return 0;
+    // Program finished successfully
+    return 0;
 
 
 }
