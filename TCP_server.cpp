@@ -18,16 +18,16 @@ static void die(const char *msg) {
     abort();
 }
 
-struct in_addr{
-    uint32_t s_addr; //32 bit IP address (IPv4 in big-endian format)
-};
+// struct in_addr{
+//     uint32_t s_addr; //32 bit IP address (IPv4 in big-endian format)
+// };
 
 
-struct sockaddr_in{
-    uint16_t sin_family; //address family
-    uint16_t sin_port;   //port number in big-endian format
-    struct in_addr sin_addr; //IP address
-};
+// struct sockaddr_in{
+//     uint16_t sin_family; //address family
+//     uint16_t sin_port;   //port number in big-endian format
+//     struct in_addr sin_addr; //IP address
+// };
 
 
 // struct sockaddr_in6 {
