@@ -7,7 +7,6 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <netinet/ip.h>
-#include <iostream>
 
 
 // Print errno and message, then abort the program
@@ -48,21 +47,18 @@ int main() {
      * It is already defined in NETWORK byte order,
      * so it can be assigned directly.
      */
-    addr.sin_addr.s_addr = INADDR_LOOPBACK;
+    addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 
     /*
      * Connect the socket to the server address
      * sockaddr_in is cast to sockaddr because connect()
      * accepts a generic sockaddr pointer.
      */
-
-     socklen_t addr_len = sizeof(addr);
     int rv = connect(socket_fd, (const struct sockaddr *)&addr, sizeof(addr));
-    
     if (rv < 0) {
         die("connect()");
     }
-    // std::cout<<getpeername(socket_fd, (struct sockaddr *)&addr, &addr_len);
+
     /*
      * Message to send to the server
      */
