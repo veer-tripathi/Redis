@@ -27,7 +27,7 @@ static int32_t read_full(int fd, char *buf, size_t n) {
             // EOF: peer closed connection
             return -1;
         }
-
+ 
         if (rv < 0) {
             if (errno == EINTR) {
                 continue;   // retry read
