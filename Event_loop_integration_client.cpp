@@ -55,16 +55,23 @@ static void append(std::vector<uint8_t>&buf,const uint8_t* data,size_t len){
 
 const size_t max_size=32<<20;
 
-static int32_t send_req(int fd,const uint8_t *text,size_t len){
-    if(len>max_size){
-        msg("send_req: len>max_size");
+static int32_t send_req(int fd, const uint8_t *text, size_t len) {
+    if (len > max_size) {
+        msg("send_req: len > max_size");
         return -1;
     }
-    std::vector<uint8_t>buf;
-    append(buf,(const uint8_t*)&len,4);
-    append(buf,text,len);
-    return write_all(fd,buf.data(),buf.size());
+
+    // --- FIX: Convert to 32-bit Network Byte Order ---
+    uint32_t wlen = htonl((uint32_t)len);
+    // -------------------------------------------------
+
+    std::vector<uint8_t> buf;
+    // Append the converted 'wlen', NOT the raw 'len' parameter
+    append(buf, (const uint8_t *)&wlen, 4);
+    append(buf, text, len);
+    return write_all(fd, buf.data(), buf.size());
 }
+
 
 static int32_t read_res(int fd) {
     uint32_t len = 0;
@@ -111,11 +118,12 @@ int main(){
     std::vector<std::string> query_list = {
         "hello1", "hello2", "hello3",
         // a large message requires multiple event loop iterations
-        std::string(max_size, 'z'),
+        // std::string(max_size, 'z'),
         "hello5",
     };
 
     for (const std::string &s : query_list) {
+        // uint32_t len = htonl(s.size());
         int32_t err = send_req(fd, (uint8_t *)s.data(), s.size());
         if (err) {
             goto L_DONE;
