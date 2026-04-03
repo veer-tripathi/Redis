@@ -141,3 +141,33 @@ static AVLNode* avl_del(AVLNode* node){
     return avl_fix(victim);
 }
 
+AVLNode* avl_offset(AVLNode* node, int64_t offset){
+    int64_t pos=0;
+    while(offset!=pos){
+        if(pos<offset && offset-pos<=avl_cnt(node->right)){
+            node=node->right;
+            pos+=(1+avl_cnt(node->left));
+        }
+        else if(pos>offset && pos-offset<=avl_cnt(node->left)){
+            node=node->left;
+            pos-=(1+avl_cnt(node->right));
+        }
+        else{
+            AVLNode* parent=node->parent;
+            if(!parent){
+                return NULL;
+            }
+            else{
+                if(parent->right==node){
+                    pos-=(avl_cnt(node->left)+1);
+                }
+                else{
+                    pos+=(avl_cnt(node->right)+1);
+                }
+                node=parent;
+            }
+        }
+    }
+    return node;
+}
+
