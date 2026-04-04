@@ -394,6 +394,50 @@ static void do_zadd(std::vector<std::string>&cmd, Buffer& out){
     return out_int(out, (int64_t)added);
 }
 
+static const ZSet k_empty_zset;
+
+static ZSet *expect_zset(std::string& s){
+    LookupKey key;
+    key.key.swap(s);
+    key.node.hcode=str_hash((uint8_t*)key.key.data(),s.size());
+    Hnode* hnode=hm_lookup(&g_data.db,&key.node,&eq);
+    if(!hnode){
+        return (ZSet*)&k_empty_zset;
+    }
+    Entry *ent=container_of(hnode,Entry,node);
+    return ent->type==T_ZSET?&ent->zset:NULL;
+}
+
+// zrem zset name
+static void z_rem(std::vector<std::string>& cmd,Buffer& out){
+    ZSet* zset=expect_zset(cmd[1]);
+    if(!zset){
+        return out_err(out,ERR_BAD_TYPE,"expect zset");
+    }
+    const std::string name=cmd[2];
+    ZNode *znode=zset_lookup(zset,name.data(),name.size());
+    if(znode){
+        zset_delete(zset,znode);
+    }
+    return out_int(out,znode?1:0);
+}
+
+//zscore zset name
+static void do_zscore(std::vector<std::string>& cmd, Buffer& out){
+    ZSet *zset=expect_zset(cmd[1]);
+    if(!zset){
+        return out_err(out,ERR_BAD_TYPE,"expect zset");
+    }
+    const std::string name=cmd[2];
+    ZNode* node=zset_lookup(zset,name.data(),name.size());
+    return node?out_dbl(out,node->score):out_nil(out);
+}
+
+static void do_zquery(std::vector<std::string>&cmd,Buffer& out){
+
+}
+
+
 
 
 static void do_request(std::vector<std::string> &cmd, Buffer &out) {
